@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Xml;
 
+import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.compat.AdaptiveIconDrawableCompat;
 
@@ -49,7 +50,7 @@ public class DrawableHack {
             throw new XmlPullParserException("No start tag found");
         }
 
-        if (Utilities.ATLEAST_NOUGAT) return (Drawable) methodInflateFromXml().invoke(drawableInflater, parser.getName(), parser, attrs, theme);
+        if (Utilities.ATLEAST_NOUGAT && !Utilities.isBuiltinAdaptiveIconBypassed(LauncherAppState.getInstanceNoCreate().getContext())) return (Drawable) methodInflateFromXml().invoke(drawableInflater, parser.getName(), parser, attrs, theme);
         else if (drawableInflater instanceof DrawableInflaterVL) {
             AdaptiveIconDrawableCompat drawable = (AdaptiveIconDrawableCompat) ((DrawableInflaterVL)drawableInflater).inflateFromXml(parser.getName(), parser, attrs, theme);
             if (!Utilities.ATLEAST_MARSHMALLOW) drawable.mUseMyUglyWorkaround=false;
@@ -65,7 +66,7 @@ public class DrawableHack {
     };
 
     public static Object getDrawableInflater(Resources res) throws Exception{
-        if (Utilities.ATLEAST_NOUGAT) {
+        if (Utilities.ATLEAST_NOUGAT && !Utilities.isBuiltinAdaptiveIconBypassed(LauncherAppState.getInstanceNoCreate().getContext())) {
             Object inflater = methodGetDrawableInflater().invoke(res);
             Field mClassLoader = fieldClassLoader();
             mClassLoader.setAccessible(true);

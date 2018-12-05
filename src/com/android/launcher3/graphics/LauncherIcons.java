@@ -305,7 +305,7 @@ public class LauncherIcons {
      * create AdaptiveIconDrawable.
      */
     public static Drawable wrapToAdaptiveIconDrawable(Context context, Drawable drawable, float scale) {
-        if (!(Utilities.isAdaptiveIconForced(context) && Utilities.ATLEAST_OREO)) {
+        if (!(Utilities.isAdaptiveIconForced(context) && !Utilities.isBuiltinAdaptiveIconBypassed(context) && Utilities.ATLEAST_OREO)) {
             return drawable;
         }
 

@@ -184,13 +184,17 @@ public class DeepShortcutManagerNative extends DeepShortcutManager {
     public Drawable getShortcutIconDrawable(ShortcutInfoCompat shortcutInfo, int density) {
         if (Utilities.ATLEAST_NOUGAT_MR1) {
             Context context = LauncherAppState.getInstanceNoCreate().getContext();
-            if (!Utilities.isAdaptiveIconDisabled(context) && Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
+            boolean isBypassingBuiltin = Utilities.isBuiltinAdaptiveIconBypassed(context);
+            if (!Utilities.isAdaptiveIconDisabled(context) && (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1 || isBypassingBuiltin)) {
                 int resId = getResId(shortcutInfo);
                 PackageManager mPackageManager = LauncherAppState.getInstanceNoCreate().getContext().getPackageManager();
                 Resources resources = null;
                 try {resources = mPackageManager.getResourcesForApplication(shortcutInfo.getPackage());}catch (Exception e){}
                 Drawable icon = null;
-                if (resId!=0 && resources!=null) icon = CustomIconsProvider.getDeepShortcutIconBackport(resId, resources);
+                if (resId!=0 && resources!=null) {
+                    if (isBypassingBuiltin) icon = CustomIconsProvider.getDeepShortcutIconBypass(resId, resources);
+                    else icon = CustomIconsProvider.getDeepShortcutIconBackport(resId, resources);
+                }
                 if (icon!=null) {mWasLastCallSuccess = true;return icon;}
             }
             try {

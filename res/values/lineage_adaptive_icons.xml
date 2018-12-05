@@ -69,15 +69,23 @@
 
     <!-- Disabled -->
     <string name="icon_adaptive_disabled_entry" translatable="false">"Disabled"</string>
-    <!-- Circle: default -->
+    <!-- Enabled -->
     <string name="icon_adaptive_enabled_entry" translatable="false">"Enabled"</string>
-    <!-- Super ellipse -->
+    <!-- Enabled (bypass) -->
+    <string name="icon_adaptive_enabled_bypass_entry" translatable="false">"Enabled (bypass OEM)"</string>
+    <!-- Force -->
     <string name="icon_adaptive_force_entry" translatable="false">"Force"</string>
+    <!-- Force (bypass) -->
+    <string name="icon_adaptive_force_bypass_entry" translatable="false">"Force (bypass OEM)"</string>
 
     <!-- Disabled -->
     <string name="icon_adaptive_disabled" translatable="false">"icon_adaptive_disabled"</string>
-    <!-- Circle: default -->
+    <!-- Enabled -->
     <string name="icon_adaptive_enabled" translatable="false">"icon_adaptive_enabled"</string>
-    <!-- Super ellipse -->
+    <!-- Enabled (bypass) -->
+    <string name="icon_adaptive_enabled_bypass" translatable="false">"icon_adaptive_enabled_bypass"</string>
+    <!-- Force -->
     <string name="icon_adaptive_force" translatable="false">"icon_adaptive_force"</string>
+    <!-- Force (bypass) -->
+    <string name="icon_adaptive_force_bypass" translatable="false">"icon_adaptive_force_bypass"</string>
 </resources>

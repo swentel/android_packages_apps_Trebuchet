@@ -75,6 +75,10 @@
     <string name="settings_icon_adaptive_desc_disabled">Always use non-boxed icons if available</string>
     <string name="settings_icon_force_adaptive_desc_on">Icons with a custom shape will be boxed</string>
     <string name="settings_icon_force_adaptive_desc_off">Icons with a custom shape will not be boxed</string>
+    <string name="settings_icon_adaptive_desc_bypass">Bypass built-in adaptive icons</string>
+    <string name="settings_icon_builtin_theme">Enable OEM theme</string>
+    <string name="settings_icon_builtin_theme_summary_off">Bypassing built-in theme</string>
+    <string name="settings_icon_builtin_theme_summary_on">Showing built-in theme</string>
     <string name="settings_edit_allow_title">Allow edit</string>
     <string name="settings_edit_allow_summary_on">Icons and widgets can be added, removed and moved on the homescreen</string>
     <string name="settings_edit_allow_summary_off">Icons and widgets can\'t be added, removed and moved on the homescreen</string>

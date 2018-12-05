@@ -113,6 +113,15 @@
             android:key="pref_icon_pack"
             android:title="@string/icon_pack_title" />
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_settings_icon_builtin_theme"
+            android:key="pref_icon_builtin_theme"
+            android:persistent="true"
+            android:title="@string/settings_icon_builtin_theme"
+            android:summaryOff="@string/settings_icon_builtin_theme_summary_off"
+            android:summaryOn="@string/settings_icon_builtin_theme_summary_on" />
+
         <ListPreference
             android:defaultValue="@string/icon_shape_default"
             android:entries="@array/icon_shape_entries"
