@@ -50,18 +50,29 @@ import com.android.launcher3.util.ResourceHack;
 import org.xmlpull.v1.XmlPullParser;
 
 public class CustomIconsProvider extends IconProvider {
+    private static final boolean flag_bypass_roundicons = false;
+
     private Context mContext;
     private IconsHandler mHandler;
+    private boolean existsAdaptive = false;
 
     public CustomIconsProvider(Context context) {
         super();
         mContext = context;
         mHandler = IconCache.getIconsHandler(context);
+
+        try {
+            Class.forName( "android.graphics.drawable.AdaptiveIconDrawable");
+            existsAdaptive=true;
+        } catch( ClassNotFoundException e ) {}
     }
 
-    private int inflateIconId(Resources resourcesForApplication, String activityName, boolean roundIcon) {
+    private int inflateIconId(Resources resourcesForApplication, String activityName, boolean roundIcon, boolean[] roundIconFlag) {
         int resId = 0;
         int resIdGlobal = 0;
+        roundIconFlag[0] = false;
+        boolean roundIconFlagActivity = false;
+        boolean roundIconFlagApplication = false;
         String activityString;
         AssetManager assets = resourcesForApplication.getAssets();
         try (XmlResourceParser parseXml = assets.openXmlResourceParser("AndroidManifest.xml")) {
@@ -78,19 +89,25 @@ public class CustomIconsProvider extends IconProvider {
                             if (activityString!=null && !activityString.isEmpty() && activityName.endsWith(activityString)) activityFound = true;
                             else activityFound = false;
                         }
-                        else if ((!roundIcon || resId == 0) && attribute.equals("icon"))
+                        else if ((!roundIcon || resId == 0) && attribute.equals("icon")) {
                             resId = Integer.parseInt(parseXml.getAttributeValue(i).substring(1));
+                            roundIconFlagActivity=false;
+                        }
                         else if (roundIcon && attribute.equals("roundIcon")) {
                             resId = Integer.parseInt(parseXml.getAttributeValue(i).substring(1));
+                            roundIconFlagActivity=true;
                         }
                     }
                 else if (eventType == XmlPullParser.START_TAG && tagName.equals("application"))
                     for (int i = 0; i < parseXml.getAttributeCount(); i++) {
                         attribute = parseXml.getAttributeName(i);
-                        if ((!roundIcon || resIdGlobal == 0) && attribute.equals("icon"))
+                        if ((!roundIcon || resIdGlobal == 0) && attribute.equals("icon")) {
                             resIdGlobal = Integer.parseInt(parseXml.getAttributeValue(i).substring(1));
+                            roundIconFlagApplication=false;
+                        }
                         else if (roundIcon && attribute.equals("roundIcon")) {
                             resIdGlobal = Integer.parseInt(parseXml.getAttributeValue(i).substring(1));
+                            roundIconFlagApplication=true;
                             break;
                         }
                     }
@@ -100,8 +117,14 @@ public class CustomIconsProvider extends IconProvider {
         } catch (Exception ex) {
             android.util.Log.e("CustomIconsProvider", "Error parsing xml", ex);
         }
-        if (resId==0) resId=resIdGlobal;
+        roundIconFlag[0] = roundIconFlagActivity;
+        if (resId==0) {resId=resIdGlobal; roundIconFlag[0]=roundIconFlagApplication;}
+        if (resId==0) roundIconFlag[0]=false;
         return resId;
+    }
+
+    private int inflateIconId(Resources resourcesForApplication, String activityName, boolean roundIcon) {
+        return inflateIconId(resourcesForApplication, activityName, roundIcon, new boolean[1]);
     }
 
     public Drawable getLegacyIcon(LauncherActivityInfo info, int iconDpi) {
@@ -141,13 +164,15 @@ public class CustomIconsProvider extends IconProvider {
 
     public Drawable getRoundIconBackport(String packageName, String activityName, int iconDpi) {
         boolean isBypassingBuiltin = Utilities.isBuiltinAdaptiveIconBypassed(mContext);
+        boolean isBypassingOEMTheme = Utilities.isBuiltinThemeBypassed(mContext);
+        boolean[] roundIconFlag = new boolean[] {false};
         Drawable legacyIcon = null;
         PackageManager mPackageManager = mContext.getPackageManager();
         Resources resourcesForApplication = null;
         try {resourcesForApplication = mPackageManager.getResourcesForApplication(packageName);}
         catch (PackageManager.NameNotFoundException e) {return null;}
 
-        int resId = inflateIconId(resourcesForApplication, activityName, true);
+        int resId = inflateIconId(resourcesForApplication, activityName, true, roundIconFlag);
 
         if (resId!=0) try {
             if (!Utilities.ATLEAST_OREO) resourcesForApplication = ResourceHack.setResSdk(resourcesForApplication, 26);
@@ -160,8 +185,14 @@ public class CustomIconsProvider extends IconProvider {
                 legacyIcon = DrawableHack.inflateFromXml(drawableInflater, parser);
             }
         } catch (Exception e) {}
+        if (isBypassingBuiltin && (flag_bypass_roundicons || isBypassingOEMTheme) && !(legacyIcon instanceof AdaptiveIconDrawableCompat)) try {
+            legacyIcon = resourcesForApplication.getDrawableForDensity(resId, iconDpi);
+        } catch (Exception e) {}
+
         if (resId!=0 && legacyIcon==null && !Utilities.ATLEAST_OREO) try{resourcesForApplication=ResourceHack.setResSdk(resourcesForApplication, android.os.Build.VERSION.SDK_INT);} catch (Exception e){}
-        if (Utilities.ATLEAST_OREO && isBypassingBuiltin && !(legacyIcon instanceof AdaptiveIconDrawableCompat)) legacyIcon=null;
+        if (Utilities.ATLEAST_OREO && isBypassingBuiltin && !(legacyIcon instanceof AdaptiveIconDrawableCompat) && !roundIconFlag[0]) legacyIcon=null;
+        if (!Utilities.ATLEAST_OREO && !isBypassingOEMTheme && !(legacyIcon instanceof  AdaptiveIconDrawableCompat) &&
+                ((!roundIconFlag[0]&&flag_bypass_roundicons)||!flag_bypass_roundicons) && (!existsAdaptive || !(legacyIcon instanceof AdaptiveIconDrawable))) legacyIcon=null;
         return legacyIcon;
     }
 
@@ -243,31 +274,29 @@ public class CustomIconsProvider extends IconProvider {
     public Drawable getIcon(LauncherActivityInfo info, int iconDpi, boolean flattenDrawable) {
         boolean isBuiltinThemeBypassed = Utilities.isBuiltinThemeBypassed(mContext);
         Drawable portedIcon = null;
+        Drawable adaptiveBypassIcon = null;
+
         if (Utilities.ATLEAST_OREO && IconShapeOverride.isSupported(mContext) && Utilities.isAdaptiveIconDisabled(mContext))
             portedIcon = getLegacyIcon(info, iconDpi);
         if (((Utilities.ATLEAST_OREO && !IconShapeOverride.isSupported(mContext)) || (!Utilities.ATLEAST_OREO)) && !Utilities.isAdaptiveIconDisabled(mContext))
             portedIcon = getRoundIconBackport(info.getComponentName().getPackageName(), info.getName(), iconDpi);
 
-        if (Utilities.ATLEAST_OREO && !Utilities.isUsingIconPack(mContext)) {
-            Drawable adaptiveBypassIcon = null;
-            if (portedIcon!=null && isBuiltinThemeBypassed) return wrapToAdaptiveIconBackport(portedIcon);
-            if (Utilities.isBuiltinAdaptiveIconBypassed(mContext)) adaptiveBypassIcon = getRoundIconBackport(info.getComponentName().getPackageName(), info.getName(), iconDpi);
-            if (adaptiveBypassIcon!=null) return wrapToAdaptiveIconBackport(adaptiveBypassIcon);
-            if (isBuiltinThemeBypassed) return wrapToAdaptiveIconBackport(info.getIcon(iconDpi));
-            try {
-                Drawable icon = mContext.getPackageManager().getActivityIcon(info.getComponentName());
-                if (icon!=null) return wrapToAdaptiveIconBackport(icon);
-            }
-            catch (Exception e) {Log.e("CustomIconsProvider", "Icon not found for activity: "+info.getName(), e);}
-            return wrapToAdaptiveIconBackport(mContext.getPackageManager().getApplicationIcon(info.getApplicationInfo()));
-        }
-        else if (!Utilities.ATLEAST_OREO && !Utilities.isUsingIconPack(mContext) && portedIcon!=null) return wrapToAdaptiveIconBackport(portedIcon);
-
-        final Bitmap bm = mHandler.getThemedDrawableIconForPackage(info.getComponentName());
-        if (bm == null || bm.sameAs(Bitmap.createBitmap(bm.getWidth(), bm.getHeight(), bm.getConfig()))) {
-            return wrapToAdaptiveIconBackport((portedIcon!=null) ? portedIcon : info.getIcon(iconDpi));
+        if (Utilities.isUsingIconPack(mContext)) {
+            final Bitmap bm = mHandler.getThemedDrawableIconForPackage(info.getComponentName());
+            if (bm != null && !bm.sameAs(Bitmap.createBitmap(bm.getWidth(), bm.getHeight(), bm.getConfig())))
+                return wrapToAdaptiveIconBackport(new BitmapDrawable(mContext.getResources(), bm));
         }
 
-        return wrapToAdaptiveIconBackport(new BitmapDrawable(mContext.getResources(), bm));
+        if (portedIcon!=null && (isBuiltinThemeBypassed || !Utilities.ATLEAST_OREO)) return wrapToAdaptiveIconBackport(portedIcon);
+        if (Utilities.ATLEAST_OREO && Utilities.isBuiltinAdaptiveIconBypassed(mContext))
+            adaptiveBypassIcon = getRoundIconBackport(info.getComponentName().getPackageName(), info.getName(), iconDpi);
+        if (adaptiveBypassIcon!=null) return wrapToAdaptiveIconBackport(adaptiveBypassIcon);
+        if (isBuiltinThemeBypassed) return wrapToAdaptiveIconBackport(info.getIcon(iconDpi));
+        try {
+            Drawable icon = mContext.getPackageManager().getActivityIcon(info.getComponentName());
+            if (icon!=null) return wrapToAdaptiveIconBackport(icon);
+        }
+        catch (Exception e) {}
+        return wrapToAdaptiveIconBackport(mContext.getPackageManager().getApplicationIcon(info.getApplicationInfo()));
     }
 }
