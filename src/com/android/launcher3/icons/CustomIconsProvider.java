@@ -25,6 +25,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -65,6 +66,40 @@ public class CustomIconsProvider extends IconProvider {
             Class.forName( "android.graphics.drawable.AdaptiveIconDrawable");
             existsAdaptive=true;
         } catch( ClassNotFoundException e ) {}
+    }
+
+    public static Drawable defaultIcon = null;
+    public static Drawable.ConstantState defaultIconConstantState = null;
+    public static Bitmap defaultIconBitmap = null;
+    public static boolean isIconDefault(Drawable drawableA) {
+        Drawable.ConstantState stateA = drawableA.getConstantState();
+        if (defaultIcon==null) defaultIcon = LauncherAppState.getInstanceNoCreate().getContext().getPackageManager().getDefaultActivityIcon();
+        if (defaultIconConstantState==null) defaultIconConstantState = defaultIcon.getConstantState();
+        return (stateA != null && defaultIconConstantState != null && stateA.equals(defaultIconConstantState))
+                || getBitmap(drawableA).sameAs((defaultIconBitmap!=null)?defaultIconBitmap:(defaultIconBitmap=getBitmap(defaultIcon)));
+    }
+
+    public static Bitmap getBitmap(Drawable drawable) {
+        Bitmap result;
+        if (drawable instanceof BitmapDrawable) {
+            result = ((BitmapDrawable) drawable).getBitmap();
+        } else {
+            int width = drawable.getIntrinsicWidth();
+            int height = drawable.getIntrinsicHeight();
+            // Some drawables have no intrinsic width - e.g. solid colours.
+            if (width <= 0) {
+                width = 1;
+            }
+            if (height <= 0) {
+                height = 1;
+            }
+
+            result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(result);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+        }
+        return result;
     }
 
     private int inflateIconId(Resources resourcesForApplication, String activityName, boolean roundIcon, boolean[] roundIconFlag) {
@@ -292,11 +327,15 @@ public class CustomIconsProvider extends IconProvider {
             adaptiveBypassIcon = getRoundIconBackport(info.getComponentName().getPackageName(), info.getName(), iconDpi);
         if (adaptiveBypassIcon!=null) return wrapToAdaptiveIconBackport(adaptiveBypassIcon);
         if (isBuiltinThemeBypassed) return wrapToAdaptiveIconBackport(info.getIcon(iconDpi));
+
+        Drawable icon = null;
         try {
-            Drawable icon = mContext.getPackageManager().getActivityIcon(info.getComponentName());
-            if (icon!=null) return wrapToAdaptiveIconBackport(icon);
+            icon = mContext.getPackageManager().getActivityIcon(info.getComponentName());
+            if (icon!=null && (portedIcon==null || !isIconDefault(icon))) return wrapToAdaptiveIconBackport(icon);
         }
         catch (Exception e) {}
-        return wrapToAdaptiveIconBackport(mContext.getPackageManager().getApplicationIcon(info.getApplicationInfo()));
+        icon = mContext.getPackageManager().getApplicationIcon(info.getApplicationInfo());
+        if (icon!=null && (portedIcon==null || !isIconDefault(icon))) return wrapToAdaptiveIconBackport(icon);
+        return wrapToAdaptiveIconBackport(portedIcon!=null?portedIcon:info.getIcon(iconDpi));
     }
 }
