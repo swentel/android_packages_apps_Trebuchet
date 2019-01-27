@@ -139,3 +139,12 @@
 -dontwarn android.app.**
 -dontwarn android.view.**
 -dontwarn android.os.**
+
+# QSB
+-keep class com.android.launcher3.qsb.QsbContainerView$QsbFragment {
+  public <init>(...);
+}
+
+-keep class com.android.launcher3.lineage.hidden.** {
+ *;
+}
