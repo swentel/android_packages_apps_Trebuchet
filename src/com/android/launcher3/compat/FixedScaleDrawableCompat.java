@@ -74,7 +74,7 @@ public class FixedScaleDrawableCompat extends DrawableWrapper {
 
     @Override
     public void draw(Canvas canvas) {
-        int saveCount = canvas.save(Canvas.MATRIX_SAVE_FLAG);
+        int saveCount = canvas.save();
         canvas.scale(mScaleX, mScaleY,
                 getBounds().exactCenterX(), getBounds().exactCenterY());
         super.draw(canvas);

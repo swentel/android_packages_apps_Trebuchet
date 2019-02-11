@@ -174,7 +174,7 @@ public class InvariantDeviceProfile {
         fillResIconDpi = getLauncherIconDensity(iconBitmapSize);
 
         // If the partner customization apk contains any grid overrides, apply them
-        // Supported overrides: numRows, numColumns, iconSize
+        // Supported overrides: numRows, numColumns, normalIconSize
         applyPartnerDeviceProfileOverrides(context, dm);
 
         Point realSize = new Point();
@@ -213,7 +213,7 @@ public class InvariantDeviceProfile {
                             Xml.asAttributeSet(parser), R.styleable.InvariantDeviceProfile);
                     int numRows = a.getInt(R.styleable.InvariantDeviceProfile_numRows, 0);
                     int numColumns = a.getInt(R.styleable.InvariantDeviceProfile_numColumns, 0);
-                    float iconSize = a.getFloat(R.styleable.InvariantDeviceProfile_iconSize, 0);
+                    float iconSize = a.getFloat(R.styleable.InvariantDeviceProfile_normalIconSize, 0);
                     profiles.add(new InvariantDeviceProfile(
                             context,
                             a.getString(R.styleable.InvariantDeviceProfile_name),

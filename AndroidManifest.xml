@@ -24,9 +24,6 @@
 
     <original-package android:name="com.cyanogenmod.trebuchet" />
 
-    tools:targetApi
-
-    <uses-sdk android:targetSdkVersion="27" android:minSdkVersion="21"/>
     <!--
     Manifest entries specific to Launcher3. This is merged with AndroidManifest-common.xml.
     Refer comments around specific entries on how to extend individual components.

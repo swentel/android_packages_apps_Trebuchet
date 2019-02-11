@@ -5,8 +5,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
+        classpath 'com.android.tools.build:gradle:3.5.0-alpha03'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
     }
 }
 
@@ -26,19 +26,25 @@ android {
             storePassword 'android'
         }
     }
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 27
-        versionCode 8010020
-        versionName "8.1.0.20"
+        targetSdkVersion 28
+        versionCode 8010022
+        versionName "8.1.0.22"
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.android
     }
     buildTypes {
         debug {
             minifyEnabled false
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard.flags'
         }
     }
     flavorDimensions "trebuchet"
@@ -109,7 +115,7 @@ repositories {
     google()
 }
 
-final String SUPPORT_LIBS_VERSION = '27.1.1'
+final String SUPPORT_LIBS_VERSION = '28.0.0'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['libGoogleFeed.jar'])
 
@@ -120,6 +126,7 @@ dependencies {
     implementation "com.android.support:support-dynamic-animation:${SUPPORT_LIBS_VERSION}"
     implementation "com.android.support:support-v4:${SUPPORT_LIBS_VERSION}"
     implementation "com.android.support:preference-v14:${SUPPORT_LIBS_VERSION}"
+    implementation "com.android.support:appcompat-v7:${SUPPORT_LIBS_VERSION}"
 
     implementation 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
 
