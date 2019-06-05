@@ -64,7 +64,7 @@ public class UiFactory {
                     launcher.getDragController(),
                     new OverviewToAllAppsTouchController(launcher),
                     new LauncherTaskViewController(launcher),
-                    new SwipeDownListener(launcher)};
+                    new StatusBarTouchController(launcher)};
         }
         if (launcher.getDeviceProfile().isVerticalBarLayout()) {
             return new TouchController[] {
@@ -72,13 +72,13 @@ public class UiFactory {
                     new OverviewToAllAppsTouchController(launcher),
                     new LandscapeEdgeSwipeController(launcher),
                     new LauncherTaskViewController(launcher),
-                    new SwipeDownListener(launcher)};
+                    new StatusBarTouchController(launcher)};
         } else {
             return new TouchController[] {
                     launcher.getDragController(),
                     new PortraitStatesTouchController(launcher),
                     new LauncherTaskViewController(launcher),
-                    new SwipeDownListener(launcher)};
+                    new StatusBarTouchController(launcher)};
         }
     }
 
@@ -166,6 +166,14 @@ public class UiFactory {
         if (model != null) {
             model.onStart();
         }
+    }
+
+    public static void onEnterAnimationComplete(Context context) {
+        // After the transition to home, enable the high-res thumbnail loader if it wasn't enabled
+        // as a part of quickstep/scrub, so that high-res thumbnails can load the next time we
+        // enter overview
+        RecentsModel.getInstance(context).getRecentsTaskLoader()
+                .getHighResThumbnailLoader().setVisible(true);
     }
 
     public static void onLauncherStateOrResumeChanged(Launcher launcher) {

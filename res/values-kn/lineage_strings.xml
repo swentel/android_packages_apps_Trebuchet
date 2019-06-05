@@ -15,17 +15,37 @@
      limitations under the License.
 -->
 <resources>
-    <!-- Application name -->
-    <!-- Settings -->
-    <!-- Categories -->
-    <!-- Settings title to show Google Now at -1 screen on launcher. [CHAR LIMIT=50] -->
-    <!-- Settings message explaining when the -1 screen is available on an LTR device. [CHAR LIMIT=100] -->
-    <!-- Settings message explaining when the -1 screen is available on an RTL device. [CHAR LIMIT=100] -->
-    <!-- Icon shapes -->
-    <!-- Grid size -->
-    <!-- Hide labels -->
-    <!-- Edit workspace -->
-    <!-- Icon badging -->
-    <!-- Folder titles -->
-    <!-- Expand statusbar -->
+    <string name="settings_category_home">ತವರು ಪರದೆಯ ಆಯ್ಕೆಗಳು</string>
+    <string name="settings_category_drawer">ಎಳೆಗೂಡು ಆಯ್ಕೆಗಳು</string>
+    <string name="settings_category_icons">ಚಿಹ್ನೆಯ ಆಯ್ಕೆಗಳು</string>
+    <string name="title_show_google_app">ಗೂಗಲ್ ಆಪ್ ತೋರಿಸು</string>
+    <string name="msg_minus_one_on_left">ತವರು ಪರದೆಯಿಂದ ನೀವು ಬಲಕ್ಕೆ ಸೆಳೆದಾಗ</string>
+    <string name="msg_minus_one_on_right">ತವರು ಪರದೆಯಿಂದ ನೀವು ಎಡಕ್ಕೆ ಸೆಳೆದಾಗ</string>
+    <string name="icon_shape_square_name">ಚೌಕ</string>
+    <string name="icon_shape_circle_name">ವೃತ್ತ</string>
+    <string name="icon_shape_squircle_name">ಚೌವೃತ್ತ</string>
+    <string name="icon_shape_teardrop_name">ಕಂಬನಿ</string>
+    <string name="grid_size_text">ಜಾಲರಿ ಗಾತ್ರ</string>
+    <string name="grid_size_rows">ಅಡ್ಡ ಸಾಲುಗಳು</string>
+    <string name="grid_size_columns">ಲಂಬ ಸಾಲುಗಳು</string>
+    <string name="grid_size_custom_positive">ಸ್ಥಾಪಿಸು</string>
+    <string name="grid_size_custom_message">ವಯಕ್ತಿಕ ಅಡ್ಡ ಮತ್ತು ಲಂಬ ಸಾಲುಗಳ ಎಣಿಕೆ ಆಯ್ಕೆಮಾಡು</string>
+    <string name="desktop_show_labels">ಮುಖ್ಯ ಪರದೆಯಲ್ಲಿ ಚಿಹ್ನೆಗಳ ಹೆಸರುಗಳನ್ನು ತೋರಿಸು</string>
+    <string name="drawer_show_labels">ಎಳೆಗೂಡಲ್ಲಿ ಚಿಹ್ನೆಗಳ ಹೆಸರನ್ನು ತೋರಿಸು</string>
+    <string name="settings_edit_allow_title">ಸಂಪಾದನೆ ಅನುಮತಿಸು</string>
+    <string name="settings_edit_allow_summary_on">ಮುಖ್ಯ ಪರದೆಯ ಮೇಲೆ ಚಿಹ್ನೆಗಳು ಮತ್ತು ಕಿಂಡಿಚೂಟಿಗಳನ್ನು ಸೇರಿಕೆ, ತೆಗೆಯುವಿಕೆ ಮತ್ತು ಸ್ಥಳಾಂತರ ಮಾಡಬಹುದು</string>
+    <string name="settings_edit_allow_summary_off">ತವರುಪರದೆಯ ಮೇಲೆ ಚಿಹ್ನೆಗಳು ಮತ್ತು ಕಿಂಡಿಚೂಟಿಗಳನ್ನು ಸೇರಿಕೆ, ತೆಗೆಯುವಿಕೆ ಮತ್ತು ಸ್ಥಳಾಂತರ ಆಗುವುದಿಲ್ಲ</string>
+    <string name="settings_edit_widgets_error">ಮುಖ್ಯ ಪರದೆಗೆ ಕಿಂಡಿಚೂಟಿಗಳನ್ನು ಸೇರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ</string>
+    <string name="settings_icon_badging_desc_on">ಸೂಚನೆಯಿರುವಾಗ ಚಿಹ್ನೆಯ ಮೇಲೆ ಒಂದು ಗುಳ್ಳೆಯನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗವುದು</string>
+    <string name="settings_icon_badging_desc_off">ಸೂಚನೆಯಿರುವಾಗ ಚಿಹ್ನೆಯ ಮೇಲೆ ಯಾವುದೇ ಗುಳ್ಳೆಯನ್ನು ಪ್ರದರ್ಶಿಸುವುದಿಲ್ಲ</string>
+    <string name="play_folder_title">ಆಡಿಸು</string>
+    <string name="statusbar_expand">ಸೂಚನೆಗಳನ್ನು ತೋರಿಸಲು ಕೆಳಮುಖವಾಗಿ ಸೆಳೆ</string>
+    <string name="trust_apps_manager_name">ಅಡಗಿದ &amp; ಸಂರಕ್ಷಿತ ಆಪ್ಗಳು</string>
+    <string name="trust_apps_auth_manager">ಗುಪ್ತ ಮತ್ತು ರಕ್ಷಿತ ಆಪ್ಗಳನ್ನು ನಿರ್ವಹಿಸಲು ಬೀಗ ತೆಗೆಯಿರಿ</string>
+    <string name="trust_apps_auth_open_app">%1$s ತೆರೆಯಲು ದೃಢೀಕರಿಸು</string>
+    <string name="trust_apps_loading">ಭರಿಸುತ್ತಿದೆ\u2026</string>
+    <string name="trust_apps_no_lock_error">ಆಪ್ ಪ್ರವೇಶವನ್ನು ನಿರ್ಬಂಧಿಸಲು ದಯವಿಟ್ಟು ಸುರಕ್ಷಿತ ಪರದೆ-ಬೀಗವನ್ನು ಹೊಂದಿಸಿ</string>
+    <string name="trust_apps_help">ಸಹಾಯ</string>
+    <string name="trust_apps_info_hidden">ಅಡಗಿದ ಆಪ್ಗಳು ಮತ್ತು ಅವುಗಳ ಕಿಂಡಿಚೂಟಿಗಳು ಎಳೆಗೂಡಿಂದ ಮರೆಯಾಗಿವೆ</string>
+    <string name="trust_apps_info_protected">ಸಂರಕ್ಷಿತ ಆಪ್ಗಳು ಏರುನೆಲೆಯಿಂದ ತೆರೆಯಲು ದೃಢೀಕರಣ ಅಗತ್ಯ</string>
 </resources>

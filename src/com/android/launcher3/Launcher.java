@@ -33,6 +33,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityOptions;
+import android.app.KeyguardManager;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.content.ActivityNotFoundException;
@@ -249,6 +250,10 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
     private final Handler mHandler = new Handler();
     private final Runnable mLogOnDelayedResume = this::logOnDelayedResume;
 
+    private static final int REQUEST_AUTH_CODE = 93;
+    private View mAuthView;
+    private ItemInfo mAuthInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (DEBUG_STRICT_MODE) {
@@ -345,6 +350,12 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
         mRotationHelper.initialize();
 
         TraceHelper.endSection("Launcher-onCreate");
+    }
+
+    @Override
+    public void onEnterAnimationComplete() {
+        super.onEnterAnimationComplete();
+        UiFactory.onEnterAnimationComplete(this);
     }
 
     @Override
@@ -539,6 +550,13 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
                 mStateManager.goToState(NORMAL, SPRING_LOADED_EXIT_DELAY);
             }
         };
+
+        if (requestCode == REQUEST_AUTH_CODE) {
+            if (resultCode == RESULT_OK) {
+                startActivitySafely(mAuthView, requestArgs.getPendingIntent(), mAuthInfo);
+            }
+            return;
+        }
 
         if (requestCode == REQUEST_BIND_APPWIDGET) {
             // This is called only if the user did not previously have permissions to bind widgets
@@ -818,6 +836,29 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         mStateManager.onWindowFocusChanged();
+    }
+
+    public void startActivitySafelyAuth(View v, Intent intent, ItemInfo item) {
+        KeyguardManager manager = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ?
+                getSystemService(KeyguardManager.class) :
+                (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        if (manager == null) {
+            throw new NullPointerException("No KeyguardManager found!");
+        }
+
+        String title = getString(R.string.trust_apps_manager_name);
+        String message = getString(R.string.trust_apps_auth_open_app, item.title);
+        Intent kmIntent = manager.createConfirmDeviceCredentialIntent(title, message);
+
+        if (kmIntent != null) {
+            mAuthView = v;
+            mAuthInfo = item;
+            setWaitingForResult(PendingRequestArgs.forIntent(REQUEST_AUTH_CODE, intent, item));
+            startActivityForResult(kmIntent, REQUEST_AUTH_CODE);
+            return;
+        }
+
+        startActivitySafely(v, intent, item);
     }
 
     public interface LauncherOverlay {
