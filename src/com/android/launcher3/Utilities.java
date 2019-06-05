@@ -51,6 +51,7 @@ import android.view.View;
 import android.view.animation.Interpolator;
 
 import com.android.launcher3.config.FeatureFlags;
+import com.android.launcher3.icons.CustomIconsProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -587,6 +588,11 @@ public final class Utilities {
     }
 
     public static <T> T getOverrideObject(Class<T> clazz, Context context, int resId) {
+        if (R.string.icon_provider_class == resId &&
+                clazz.getSimpleName().equals(IconProvider.class.getSimpleName())) {
+            return (T) new CustomIconsProvider(context);
+        }
+
         String className = context.getString(resId);
         if (!TextUtils.isEmpty(className)) {
             try {
@@ -627,5 +633,40 @@ public final class Utilities {
     public static boolean isWorkspaceEditAllowed(Context context) {
         SharedPreferences prefs = getPrefs(context.getApplicationContext());
         return prefs.getBoolean(SettingsActivity.KEY_WORKSPACE_EDIT, true);
+    }
+
+    public static boolean isUsingIconPack(Context context) {
+        SharedPreferences prefs = Utilities.getPrefs(context.getApplicationContext());
+        String defaultPack = context.getString(R.string.icon_pack_default);
+        String defaultLocalizedPack = context.getString(R.string.icon_pack_system);
+        String currentPack = prefs.getString(SettingsActivity.KEY_ICON_PACK, defaultPack);
+
+        // if our current icon pack does not equal to the default or localized default icon pack,
+        // assume we are using an icon pack
+        return !(currentPack.equals(defaultPack) || currentPack.equals(defaultLocalizedPack));
+    }
+
+    public static boolean isAdaptiveIconForced(Context context) {
+        //TODO this method
+        return false;
+    }
+
+    public static boolean isAdaptiveIconDisabled(Context context) {
+        SharedPreferences prefs = getPrefs(context.getApplicationContext());
+        //TODO this method
+        return false;
+    }
+
+    public static boolean isShortcutBackportDisabled() {
+        return Utilities.ATLEAST_NOUGAT_MR1;
+    }
+    public static boolean isBuiltinAdaptiveIconBypassed(Context context) {
+        //TODO this method
+        return false;
+    }
+    public static boolean isBuiltinThemeBypassed(Context context) {
+        SharedPreferences prefs = getPrefs(context.getApplicationContext());
+        //TODO this method
+        return false;
     }
 }

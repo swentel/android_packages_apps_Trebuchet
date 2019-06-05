@@ -32,6 +32,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION;
 import android.os.Handler;
@@ -48,6 +49,7 @@ import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.graphics.BitmapInfo;
 import com.android.launcher3.graphics.BitmapRenderer;
 import com.android.launcher3.graphics.LauncherIcons;
+import com.android.launcher3.icons.IconsHandler;
 import com.android.launcher3.model.PackageItemInfo;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.InstantAppResolver;
@@ -86,7 +88,10 @@ public class IconCache {
         public CharSequence title = "";
         public CharSequence contentDescription = "";
         public boolean isLowResIcon;
+        public boolean isCustom=false;
     }
+
+    private static IconsHandler sIconsHandler;
 
     private final HashMap<UserHandle, BitmapInfo> mDefaultIcons = new HashMap<>();
     @Thunk final MainThreadExecutor mMainThreadExecutor = new MainThreadExecutor();
@@ -390,7 +395,7 @@ public class IconCache {
 
         Bitmap lowResIcon = generateLowResIcon(entry.icon);
         ContentValues values = newContentValues(entry.icon, lowResIcon, entry.color,
-                entry.title.toString(), app.getApplicationInfo().packageName);
+                entry.title.toString(), app.getApplicationInfo().packageName, entry.isCustom);
         addIconToDB(values, app.getComponentName(), info, userSerial);
     }
 
@@ -559,6 +564,8 @@ public class IconCache {
                             if (DEBUG) Log.d(TAG, "using package default icon for " +
                                     componentName.toShortString());
                             packageEntry.applyTo(entry);
+                            entry.icon = packageEntry.icon;
+                            entry.isCustom = packageEntry.isCustom;
                             entry.title = packageEntry.title;
                             entry.contentDescription = packageEntry.contentDescription;
                         }
@@ -588,6 +595,62 @@ public class IconCache {
     public synchronized void clear() {
         Preconditions.assertWorkerThread();
         mIconDb.clear();
+    }
+
+    public void flush() {
+        synchronized (mCache) {
+            mCache.clear();
+        }
+    }
+
+    CacheEntry getCacheEntry(LauncherActivityInfo app) {
+        if (app == null) {
+            return null;
+        }
+        final ComponentKey key = new ComponentKey(app.getComponentName(), app.getUser());
+        return mCache.get(key);
+    }
+
+    public void addCustomInfoToDataBase(Drawable icon, ItemInfo info, CharSequence title) {
+        addCustomInfoToDataBase(icon, info, title, false);
+    }
+
+    public void addCustomInfoToDataBase(Drawable icon, ItemInfo info, CharSequence title, boolean themed) {
+        LauncherActivityInfo app = mLauncherApps.resolveActivity(info.getIntent(), info.user);
+        if (app == null) {
+            return;
+        }
+
+        final ComponentKey key = new ComponentKey(app.getComponentName(), app.getUser());
+        CacheEntry entry = mCache.get(key);
+        if (themed) entry.isCustom = true;
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = mPackageManager.getPackageInfo(
+                    app.getComponentName().getPackageName(), 0);
+        } catch (NameNotFoundException ignored) {
+        }
+        // We can't reuse the entry if the high-res icon is not present.
+        if (entry == null || entry.isLowResIcon || entry.icon == null) {
+            entry = new CacheEntry();
+        }
+        entry.icon = ((BitmapDrawable) icon).getBitmap();
+        entry.title = title != null ? title : app.getLabel();
+        entry.contentDescription = mUserManager.getBadgedLabelForUser(entry.title, app.getUser());
+        mCache.put(key, entry);
+
+        Bitmap lowResIcon = generateLowResIcon(entry.icon);
+        ContentValues values = newContentValues(entry.icon, lowResIcon, entry.color, entry.title.toString(),
+                app.getApplicationInfo().packageName, entry.isCustom);
+
+        if (packageInfo != null) {
+            addIconToDB(values, app.getComponentName(), packageInfo,
+                    mUserManager.getSerialNumberForUser(app.getUser()));
+        }
+    }
+
+    public boolean isCustomIcon(LauncherActivityInfo info) {
+        return getCacheEntry(info).isCustom;
     }
 
     /**
@@ -621,6 +684,13 @@ public class IconCache {
     private static ComponentKey getPackageKey(String packageName, UserHandle user) {
         ComponentName cn = new ComponentName(packageName, packageName + EMPTY_CLASS_NAME);
         return new ComponentKey(cn, user);
+    }
+
+    public static IconsHandler getIconsHandler(Context context) {
+        if (sIconsHandler == null) {
+            sIconsHandler = new IconsHandler(context);
+        }
+        return sIconsHandler;
     }
 
     /**
@@ -666,7 +736,7 @@ public class IconCache {
                     // Add the icon in the DB here, since these do not get written during
                     // package updates.
                     ContentValues values = newContentValues(iconInfo.icon, lowResIcon, entry.color,
-                            entry.title.toString(), packageName);
+                            entry.title.toString(), packageName, entry.isCustom);
                     addIconToDB(values, cacheKey.componentName, info,
                             mUserManager.getSerialNumberForUser(user));
 
@@ -801,7 +871,7 @@ public class IconCache {
     }
 
     private static final class IconDB extends SQLiteCacheHelper {
-        private final static int RELEASE_VERSION = 24;
+        private final static int RELEASE_VERSION = 1000;
 
         private final static String TABLE_NAME = "icons";
         private final static String COLUMN_ROWID = "rowid";
@@ -811,6 +881,7 @@ public class IconCache {
         private final static String COLUMN_VERSION = "version";
         private final static String COLUMN_ICON = "icon";
         private final static String COLUMN_ICON_LOW_RES = "icon_low_res";
+        private final static String COLUMN_BOOL_CUSTOMICON = "icon_custom";
         private final static String COLUMN_ICON_COLOR = "icon_color";
         private final static String COLUMN_LABEL = "label";
         private final static String COLUMN_SYSTEM_STATE = "system_state";
@@ -833,13 +904,14 @@ public class IconCache {
                     COLUMN_ICON_COLOR + " INTEGER NOT NULL DEFAULT 0, " +
                     COLUMN_LABEL + " TEXT, " +
                     COLUMN_SYSTEM_STATE + " TEXT, " +
+                    COLUMN_BOOL_CUSTOMICON + " INTEGER, " +
                     "PRIMARY KEY (" + COLUMN_COMPONENT + ", " + COLUMN_USER + ") " +
                     ");");
         }
     }
 
     private ContentValues newContentValues(Bitmap icon, Bitmap lowResIcon, int iconColor,
-            String label, String packageName) {
+            String label, String packageName, boolean isCustom) {
         ContentValues values = new ContentValues();
         values.put(IconDB.COLUMN_ICON, Utilities.flattenBitmap(icon));
         values.put(IconDB.COLUMN_ICON_LOW_RES, Utilities.flattenBitmap(lowResIcon));
@@ -847,6 +919,7 @@ public class IconCache {
 
         values.put(IconDB.COLUMN_LABEL, label);
         values.put(IconDB.COLUMN_SYSTEM_STATE, mIconProvider.getIconSystemState(packageName));
+        values.put(IconDB.COLUMN_BOOL_CUSTOMICON, isCustom?1:0);
 
         return values;
     }

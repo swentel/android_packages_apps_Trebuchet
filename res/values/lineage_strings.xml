@@ -32,10 +32,12 @@
     <string name="msg_minus_one_on_right">When you swipe left from main home screen</string>
 
     <!-- Icon shapes -->
+    <string name="icon_shape_none_name">None</string>
     <string name="icon_shape_square_name">Square</string>
     <string name="icon_shape_circle_name">Circle</string>
     <string name="icon_shape_squircle_name">Squircle</string>
     <string name="icon_shape_teardrop_name">Teardrop</string>
+    <string name="icon_shape_super_ellipse_name">Super ellipse</string>
 
     <!-- Grid size -->
     <string name="grid_size_text">Grid size</string>
@@ -43,6 +45,20 @@
     <string name="grid_size_columns">Columns</string>
     <string name="grid_size_custom_positive">Set</string>
     <string name="grid_size_custom_message">Select custom columns and rows count</string>
+
+    <!-- Custom icons -->
+    <string name="app_edit_drop_target_label">Edit</string>
+    <string name="icon_pack_title">Icon pack</string>
+    <string name="icon_pack_picker">Select icon</string>
+    <string name="icon_pack_picker_search">Search icon</string>
+    <string name="icon_pack_suggestions">Suggestions</string>
+    <string name="icon_pack_all_icons">All icons</string>
+    <string name="icon_pack_reset">Reset</string>
+    <string name="icon_pack_system">System (Default)</string>
+
+    <!-- Dark/Light theme -->
+    <string name="theme_summary_light">Using light theme</string>
+    <string name="theme_summary_dark">Using dark theme</string>
 
     <!-- Hide labels -->
     <string name="desktop_show_labels">Show icon labels on desktop</string>

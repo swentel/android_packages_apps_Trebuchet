@@ -84,6 +84,7 @@ public class SettingsActivity extends Activity {
     private static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
 
     public static final String KEY_WORKSPACE_EDIT = "pref_workspace_edit";
+    public static final String KEY_ICON_PACK = "pref_icon_pack";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
