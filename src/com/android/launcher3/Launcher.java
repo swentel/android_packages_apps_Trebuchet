@@ -103,6 +103,7 @@ import com.android.launcher3.states.InternalStateHandler;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.uioverrides.UiFactory;
+import com.android.launcher3.uioverrides.WallpaperColorInfo;
 import com.android.launcher3.userevent.nano.LauncherLogProto;
 import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
 import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
@@ -145,7 +146,7 @@ import java.util.Set;
  * Default launcher application.
  */
 public class Launcher extends BaseDraggingActivity implements LauncherExterns,
-        LauncherModel.Callbacks, LauncherProviderChangeListener, UserEventDelegate{
+        LauncherModel.Callbacks, LauncherProviderChangeListener, UserEventDelegate, WallpaperColorInfo.OnThemeChangeListener{
     public static final String TAG = "Launcher";
     static final boolean LOGD = false;
 
@@ -271,6 +272,10 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
                     .build());
         }
         TraceHelper.beginSection("Launcher-onCreate");
+
+        WallpaperColorInfo wallpaperColorInfo = WallpaperColorInfo.getInstance(this);
+        wallpaperColorInfo.setOnThemeChangeListener(this);
+        overrideTheme(wallpaperColorInfo);
 
         super.onCreate(savedInstanceState);
         TraceHelper.partitionSection("Launcher-onCreate", "super call");
@@ -411,6 +416,24 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
 
     public LauncherStateManager getStateManager() {
         return mStateManager;
+    }
+
+    public void onThemeChanged() {
+        recreate();
+    }
+
+    public void overrideTheme(WallpaperColorInfo wallpaperColorInfo) {
+        SharedPreferences mPrefs = Utilities.getPrefs(this);
+        boolean supportsDarkText = wallpaperColorInfo.supportsDarkText();
+        String darkThemeMode = mPrefs.getString(SettingsActivity.KEY_THEME_DARK, this.getString(R.string.darktheme_auto));
+
+        if (darkThemeMode.equals(this.getString(R.string.darktheme_off))) {if (supportsDarkText) setTheme(R.style.LauncherTheme_DarkText);}
+        else if (darkThemeMode.equals(this.getString(R.string.darktheme_drawer))) setTheme(supportsDarkText?R.style.LauncherTheme_PartialDark_DarkText:R.style.LauncherTheme_PartialDark);
+        else if (darkThemeMode.equals(this.getString(R.string.darktheme_full))) setTheme(supportsDarkText?R.style.LauncherTheme_Dark_DarkText:R.style.LauncherTheme_Dark);
+        else {
+            if (wallpaperColorInfo.isDark()) setTheme(R.style.LauncherTheme_Dark);
+            else if (supportsDarkText) setTheme(R.style.LauncherTheme_DarkText);
+        }
     }
 
     @Override

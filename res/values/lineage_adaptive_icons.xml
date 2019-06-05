@@ -37,6 +37,20 @@
         <item>@string/mask_path_teardrop</item>
     </string-array>
 
+    <!-- Masks names -->
+    <string-array name="icon_adaptive_entries" translatable="false">
+        <item>@string/icon_adaptive_disabled_entry</item>
+        <item>@string/icon_adaptive_enabled_entry</item>
+        <item>@string/icon_adaptive_force_entry</item>
+    </string-array>
+
+    <!-- Mask paths references -->
+    <string-array name="icon_adaptive_paths" translatable="false">
+        <item>@string/icon_adaptive_disabled</item>
+        <item>@string/icon_adaptive_enabled</item>
+        <item>@string/icon_adaptive_force</item>
+    </string-array>
+
     <!-- Circle: default -->
     <string name="mask_path_circle" translatable="false">"M50 0A50 50,0,1,1,50 100A50 50,0,1,1,50 0"</string>
     <!-- Rounded square -->
@@ -47,4 +61,29 @@
     <string name="mask_path_squircle" translatable="false">"M50,0 C10,0 0,10 0,50 0,90 10,100 50,100 90,100 100,90 100,50 100,10 90,0 50,0 Z"</string>
     <!-- Teardrop -->
     <string name="mask_path_teardrop" translatable="false">"M50,0A50,50,0,0 1 100,50 L100,85 A15,15,0,0 1 85,100 L50,100 A50,50,0,0 1 50,0z"</string>
+
+
+    <string name="icon_adaptive_default" translatable="false">@string/icon_adaptive_enabled</string>
+
+    <!-- Disabled -->
+    <string name="icon_adaptive_disabled_entry" translatable="false">"Disabled"</string>
+    <!-- Enabled -->
+    <string name="icon_adaptive_enabled_entry" translatable="false">"Enabled"</string>
+    <!-- Enabled (bypass) -->
+    <string name="icon_adaptive_enabled_bypass_entry" translatable="false">"Enabled (bypass OEM)"</string>
+    <!-- Force -->
+    <string name="icon_adaptive_force_entry" translatable="false">"Force"</string>
+    <!-- Force (bypass) -->
+    <string name="icon_adaptive_force_bypass_entry" translatable="false">"Force (bypass OEM)"</string>
+
+    <!-- Disabled -->
+    <string name="icon_adaptive_disabled" translatable="false">"icon_adaptive_disabled"</string>
+    <!-- Enabled -->
+    <string name="icon_adaptive_enabled" translatable="false">"icon_adaptive_enabled"</string>
+    <!-- Enabled (bypass) -->
+    <string name="icon_adaptive_enabled_bypass" translatable="false">"icon_adaptive_enabled_bypass"</string>
+    <!-- Force -->
+    <string name="icon_adaptive_force" translatable="false">"icon_adaptive_force"</string>
+    <!-- Force (bypass) -->
+    <string name="icon_adaptive_force_bypass" translatable="false">"icon_adaptive_force_bypass"</string>
 </resources>

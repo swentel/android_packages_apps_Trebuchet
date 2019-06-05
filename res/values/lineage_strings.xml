@@ -37,7 +37,6 @@
     <string name="icon_shape_circle_name">Circle</string>
     <string name="icon_shape_squircle_name">Squircle</string>
     <string name="icon_shape_teardrop_name">Teardrop</string>
-    <string name="icon_shape_super_ellipse_name">Super ellipse</string>
 
     <!-- Grid size -->
     <string name="grid_size_text">Grid size</string>
@@ -59,6 +58,20 @@
     <!-- Dark/Light theme -->
     <string name="theme_summary_light">Using light theme</string>
     <string name="theme_summary_dark">Using dark theme</string>
+    <string name="settings_theme_dark">Dark theme</string>
+
+    <!-- Icon builtin theme -->
+    <string name="settings_icon_builtin_theme">Enable OEM theme</string>
+    <string name="settings_icon_builtin_theme_summary_off">Bypassing built-in theme</string>
+    <string name="settings_icon_builtin_theme_summary_on">Showing built-in theme</string>
+
+    <!-- IAdaptive icon preference -->
+    <string name="settings_icon_adaptive_title">Adaptive icons</string>
+    <string name="settings_icon_adaptive_desc_disabled">Always use non-boxed icons if available</string>
+    <string name="settings_icon_force_adaptive_title">Force adaptive icons</string>
+    <string name="settings_icon_force_adaptive_desc_on">Icons with a custom shape will be boxed</string>
+    <string name="settings_icon_force_adaptive_desc_off">Icons with a custom shape will not be boxed</string>
+    <string name="settings_icon_adaptive_desc_bypass">Bypass built-in adaptive icons</string>
 
     <!-- Hide labels -->
     <string name="desktop_show_labels">Show icon labels on desktop</string>

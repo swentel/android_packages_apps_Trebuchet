@@ -50,6 +50,7 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
     private int mSecondaryColor;
     private boolean mIsDark;
     private boolean mSupportsDarkText;
+    private OnThemeChangeListener mOnThemeChangeListener;
 
     private OnChangeListener[] mTempListeners;
 
@@ -79,8 +80,10 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
     @Override
     public void onColorsChanged(WallpaperColorsCompat colors, int which) {
         if ((which & FLAG_SYSTEM) != 0) {
+            boolean wasDarkTheme = mIsDark;
+            boolean didSupportDarkText = mSupportsDarkText;
             update(colors);
-            notifyChange();
+            notifyChange(wasDarkTheme != mIsDark || didSupportDarkText != mSupportsDarkText);
         }
     }
 
@@ -101,6 +104,10 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
                 & WallpaperColorsCompat.HINT_SUPPORTS_DARK_THEME) > 0 : false;
     }
 
+    public void setOnThemeChangeListener(OnThemeChangeListener onThemeChangeListener) {
+        this.mOnThemeChangeListener = onThemeChangeListener;
+    }
+
     public void addOnChangeListener(OnChangeListener listener) {
         mListeners.add(listener);
     }
@@ -109,19 +116,28 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
         mListeners.remove(listener);
     }
 
-    private void notifyChange() {
+    private void notifyChange(boolean themeChanged) {
         OnChangeListener[] copy =
                 mTempListeners != null && mTempListeners.length == mListeners.size() ?
                         mTempListeners : new OnChangeListener[mListeners.size()];
 
         // Create a new array to avoid concurrent modification when the activity destroys itself.
         mTempListeners = mListeners.toArray(copy);
-        for (OnChangeListener listener : mTempListeners) {
+        if (themeChanged) {
+            if (mOnThemeChangeListener != null) {
+                mOnThemeChangeListener.onThemeChanged();
+            }
+        }
+        else for (OnChangeListener listener : mTempListeners) {
             listener.onExtractedColorsChanged(this);
         }
     }
 
     public interface OnChangeListener {
         void onExtractedColorsChanged(WallpaperColorInfo wallpaperColorInfo);
+    }
+
+    public interface OnThemeChangeListener {
+        void onThemeChanged();
     }
 }

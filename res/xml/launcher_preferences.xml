@@ -69,6 +69,15 @@
         android:key="category_drawer"
         android:title="@string/settings_category_drawer">
 
+        <ListPreference
+            android:defaultValue="@string/darktheme_auto"
+            android:entries="@array/darktheme_entries"
+            android:entryValues="@array/darktheme_values"
+            android:key="pref_ui_darktheme"
+            android:persistent="true"
+            android:summary="%s"
+            android:title="@string/settings_theme_dark" />
+
         <SwitchPreference
             android:key="pref_drawer_show_labels"
             android:title="@string/drawer_show_labels"
@@ -92,6 +101,23 @@
             android:entryValues="@array/icon_shape_paths"
             android:defaultValue="@string/icon_shape_default"
             android:persistent="false" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_icon_builtin_theme"
+            android:persistent="true"
+            android:title="@string/settings_icon_builtin_theme"
+            android:summaryOff="@string/settings_icon_builtin_theme_summary_off"
+            android:summaryOn="@string/settings_icon_builtin_theme_summary_on" />
+
+        <ListPreference
+            android:defaultValue="@string/icon_adaptive_default"
+            android:entries="@array/icon_adaptive_entries"
+            android:entryValues="@array/icon_adaptive_paths"
+            android:key="pref_icon_adaptive"
+            android:persistent="true"
+            android:summary="%s"
+            android:title="@string/settings_icon_adaptive_title" />
 
         <com.android.launcher3.views.ButtonPreference
             android:key="pref_icon_badging"

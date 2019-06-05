@@ -78,6 +78,10 @@ public class SettingsActivity extends Activity {
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 600;
     private static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
 
+    public static final String KEY_ADAPTIVE_ICONS = "pref_icon_adaptive";
+    public static final String KEY_THEME_BUILTIN_ICONS = "pref_icon_builtin_theme";
+    public static final String KEY_THEME_DARK = "pref_ui_darktheme";
+
     public static final String KEY_MINUS_ONE = "pref_enable_minus_one";
     private static final String KEY_GRID_SIZE = "pref_grid_size";
     private static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
@@ -113,6 +117,10 @@ public class SettingsActivity extends Activity {
         private String mPreferenceKey;
         private boolean mPreferenceHighlighted = false;
         private boolean mShouldRestart = false;
+
+        private Preference mDarkThemePref;
+        private ListPreference mAdaptiveIconsPref;
+        private SwitchPreference mThemeBuiltinIconsPref;
 
         private SharedPreferences mPrefs;
         private Preference mGridPref;
@@ -199,6 +207,53 @@ public class SettingsActivity extends Activity {
                     return true;
                 });
             }
+
+            mDarkThemePref = findPreference(KEY_THEME_DARK);
+
+            mAdaptiveIconsPref = (ListPreference)
+                    findPreference(KEY_ADAPTIVE_ICONS);
+            updateAdaptiveIconsEntry();
+            if (mAdaptiveIconsPref != null) {
+                mAdaptiveIconsPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    // Clear the icon cache.
+                    LauncherAppState.getInstance(Utilities.ATLEAST_MARSHMALLOW?getContext():getActivity().getApplicationContext()).getIconCache().clear();
+                    return true;
+                });
+            }
+
+            mThemeBuiltinIconsPref = (SwitchPreference)
+                    findPreference(KEY_THEME_BUILTIN_ICONS);
+            updateAdaptiveIconsEntry();
+            if (mThemeBuiltinIconsPref != null) {
+                mThemeBuiltinIconsPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    // Clear the icon cache.
+                    LauncherAppState.getInstance(Utilities.ATLEAST_MARSHMALLOW?getContext():getActivity().getApplicationContext()).getIconCache().clear();
+                    return true;
+                });
+            }
+        }
+
+        private void updateDarkThemeEntry() {
+            Context context = getActivity().getApplicationContext();
+            String darkThemeMode = mPrefs.getString(KEY_THEME_DARK, context.getString(R.string.darktheme_auto));
+
+            if (darkThemeMode.equals(context.getString(R.string.darktheme_off))) mDarkThemePref.setSummary(R.string.darktheme_off_desc);
+            else if (darkThemeMode.equals(context.getString(R.string.darktheme_drawer))) mDarkThemePref.setSummary(R.string.darktheme_drawer_desc);
+            else if (darkThemeMode.equals(context.getString(R.string.darktheme_full))) mDarkThemePref.setSummary(R.string.darktheme_full_desc);
+            else mDarkThemePref.setSummary(R.string.darktheme_auto_desc);
+        }
+
+        private void updateAdaptiveIconsEntry() {
+            Context context = getActivity().getApplicationContext();
+            String adaptiveIconsMode = mPrefs.getString(KEY_ADAPTIVE_ICONS, context.getString(R.string.icon_adaptive_default));
+
+            if (adaptiveIconsMode.equals(context.getString(R.string.icon_adaptive_disabled))) mAdaptiveIconsPref.setSummary(R.string.settings_icon_adaptive_desc_disabled);
+            else if (adaptiveIconsMode.equals(context.getString(R.string.icon_adaptive_force))) mAdaptiveIconsPref.setSummary(R.string.settings_icon_force_adaptive_desc_on);
+            else if (adaptiveIconsMode.equals(context.getString(R.string.icon_adaptive_enabled_bypass)))
+                mAdaptiveIconsPref.setSummary(context.getString(R.string.settings_icon_force_adaptive_desc_off)+'\n'+context.getString(R.string.settings_icon_adaptive_desc_bypass));
+            else if (adaptiveIconsMode.equals(context.getString(R.string.icon_adaptive_force_bypass)))
+                mAdaptiveIconsPref.setSummary(context.getString(R.string.settings_icon_force_adaptive_desc_on)+'\n'+context.getString(R.string.settings_icon_adaptive_desc_bypass));
+            else mAdaptiveIconsPref.setSummary(R.string.settings_icon_force_adaptive_desc_off);
         }
 
         @Override
@@ -268,12 +323,19 @@ public class SettingsActivity extends Activity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             switch (key) {
-                case KEY_GRID_SIZE:
-                    mGridPref.setSummary(mPrefs.getString(KEY_GRID_SIZE, getDefaultGridSize()));
-                    mShouldRestart = true;
-                    break;
+                case KEY_THEME_DARK:
+                    updateDarkThemeEntry();
                 case KEY_SHOW_DESKTOP_LABELS:
                 case KEY_SHOW_DRAWER_LABELS:
+                case KEY_THEME_BUILTIN_ICONS:
+                    mShouldRestart = true;
+                    break;
+                case KEY_ADAPTIVE_ICONS:
+                    updateAdaptiveIconsEntry();
+                    mShouldRestart = true;
+                    break;
+                case KEY_GRID_SIZE:
+                    mGridPref.setSummary(mPrefs.getString(KEY_GRID_SIZE, getDefaultGridSize()));
                     mShouldRestart = true;
                     break;
             }

@@ -647,26 +647,24 @@ public final class Utilities {
     }
 
     public static boolean isAdaptiveIconForced(Context context) {
-        //TODO this method
-        return false;
+        String pref = getPrefs(context.getApplicationContext()).getString(SettingsActivity.KEY_ADAPTIVE_ICONS, context.getString(R.string.icon_adaptive_default));
+        return pref.equals(context.getString(R.string.icon_adaptive_force)) || pref.equals(context.getString(R.string.icon_adaptive_force_bypass));
     }
 
     public static boolean isAdaptiveIconDisabled(Context context) {
         SharedPreferences prefs = getPrefs(context.getApplicationContext());
-        //TODO this method
-        return false;
+        return prefs.getString(SettingsActivity.KEY_ADAPTIVE_ICONS, context.getString(R.string.icon_adaptive_default)).equals(context.getString(R.string.icon_adaptive_disabled));
     }
 
     public static boolean isShortcutBackportDisabled() {
         return Utilities.ATLEAST_NOUGAT_MR1;
     }
     public static boolean isBuiltinAdaptiveIconBypassed(Context context) {
-        //TODO this method
-        return false;
+        String pref = getPrefs(context.getApplicationContext()).getString(SettingsActivity.KEY_ADAPTIVE_ICONS, context.getString(R.string.icon_adaptive_default));
+        return pref.equals(context.getString(R.string.icon_adaptive_enabled_bypass)) || pref.equals(context.getString(R.string.icon_adaptive_force_bypass));
     }
     public static boolean isBuiltinThemeBypassed(Context context) {
         SharedPreferences prefs = getPrefs(context.getApplicationContext());
-        //TODO this method
-        return false;
+        return !prefs.getBoolean(SettingsActivity.KEY_THEME_BUILTIN_ICONS, false);
     }
 }
