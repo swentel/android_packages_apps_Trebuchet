@@ -48,7 +48,7 @@ public class ProtectedManagerActivity extends Activity implements
         mRecyclerView = findViewById(R.id.protected_apps_list);
         mLoadingLayout = findViewById(R.id.protected_apps_loading);
 
-        mAdapter = new ProtectedAppsAdapter(this);
+        mAdapter = new ProtectedAppsAdapter(this, getApplicationContext());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);

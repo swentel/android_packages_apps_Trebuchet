@@ -1,5 +1,8 @@
 package com.android.launcher3.protect;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -8,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,9 +24,11 @@ public class ProtectedAppsAdapter extends
         RecyclerView.Adapter<ProtectedAppsAdapter.ProtectedAppViewHolder> {
     private List<ProtectedComponent> mComponents = new ArrayList<>();
     private final IProtectedApp mOnItemChangeListener;
+    private Context context;
 
-    ProtectedAppsAdapter(IProtectedApp listener) {
+    ProtectedAppsAdapter(IProtectedApp listener, Context context) {
         mOnItemChangeListener = listener;
+        this.context = context;
     }
 
     void updateAppList(List<ProtectedComponent> components) {
@@ -51,6 +57,7 @@ public class ProtectedAppsAdapter extends
         private View mView;
         private ImageView mAppIcon;
         private TextView mAppLabel;
+        private ImageButton mAppLaunch;
         private ImageView mProtectedSwitch;
 
         ProtectedAppViewHolder(View itemView) {
@@ -58,6 +65,7 @@ public class ProtectedAppsAdapter extends
             mView = itemView;
             mAppIcon = itemView.findViewById(R.id.item_protected_app_icon);
             mAppLabel = itemView.findViewById(R.id.item_protected_app_title);
+            mAppLaunch = itemView.findViewById(R.id.item_protected_app_launch);
             mProtectedSwitch = itemView.findViewById(R.id.item_protected_app_switch);
         }
 
@@ -78,6 +86,14 @@ public class ProtectedAppsAdapter extends
                 avd.start();
 
                 mOnItemChangeListener.onItemChanged(component.packageName, component.isProtected);
+            });
+
+            mAppLaunch.setOnClickListener(v -> {
+                try {
+                    Intent i = context.getPackageManager().getLaunchIntentForPackage(component.packageName);
+                    context.startActivity(i);
+                }
+                catch (Exception ignored) {}
             });
         }
     }

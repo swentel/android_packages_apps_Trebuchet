@@ -16,6 +16,16 @@
         android:layout_height="24dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
+        android:layout_marginEnd="56dp" />
+
+    <ImageButton
+        android:src="@drawable/ic_launcher_home"
+        android:id="@+id/item_protected_app_launch"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_toStartOf="@id/item_protected_app_launch"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         android:layout_marginEnd="16dp" />
 
     <TextView
@@ -24,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_alignEnd="@id/item_protected_app_switch"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="56dp"
+        android:layout_marginEnd="36dp"
         android:layout_marginStart="72dp" />
+
 </RelativeLayout>
