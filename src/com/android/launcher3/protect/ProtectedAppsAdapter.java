@@ -76,7 +76,7 @@ public class ProtectedAppsAdapter extends
             mProtectedSwitch.setImageResource(component.isProtected ?
                 R.drawable.ic_protected_locked : R.drawable.ic_protected_unlocked);
 
-            mView.setOnClickListener(v -> {
+            mAppLabel.setOnClickListener(v -> {
                 component.isProtected = !component.isProtected;
 
                 mProtectedSwitch.setImageResource(component.isProtected ?
